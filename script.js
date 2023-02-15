@@ -103,6 +103,26 @@ function Speed_up() {
 // when page is loaded
 window.onload = function () {
     Speed_up();
+    document.addEventListener('keydown', function (e) {
+        
+        var button = document.querySelector('.speed-up-primary');
+        var video = document.querySelector('video');
+
+        switch (e.key) {
+            case 'd':
+                video.playbackRate += 0.25;
+                button.innerHTML = `x${video.playbackRate}`;
+                break;
+            case 's':
+                video.playbackRate -= 0.25;
+                button.innerHTML = `x${video.playbackRate}`;
+                break;
+            default:
+                video.playbackRate = 1;
+                button.innerHTML = `x${video.playbackRate}`;
+        }
+    }
+    );
 }
 
 timeout = null;
@@ -126,27 +146,3 @@ document.addEventListener("DOMSubtreeModified", function () {
 
 
 
-var buttons = document.querySelectorAll('.speed-up-class');
-if (
-    buttons.length > 1
-) {
-    //when d is clicked add 0.25
-    //when s is clicked substract 0.25
-    document.addEventListener('keydown', function (e) {
-        var button = document.querySelector('.speed-up-primary');
-        switch (e.key) {
-            case 'd':
-                video.playbackRate += 0.25;
-                button.innerHTML = `x${video.playbackRate}`;
-                break;
-            case 's':
-                video.playbackRate -= 0.25;
-                button.innerHTML = `x${video.playbackRate}`;
-                break;
-            default:
-                video.playbackRate = 1;
-                button.innerHTML = `x${video.playbackRate}`;
-        }
-    }
-    );
-}
