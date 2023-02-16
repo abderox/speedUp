@@ -1,7 +1,7 @@
 /**
  * @author : https://github.com/abderox
  * @Extension_Name : SpeedUp
- * @Version : 1.0.0
+ * @Version : 1.0.2
  */
 
 
