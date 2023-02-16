@@ -143,7 +143,7 @@ document.addEventListener("DOMSubtreeModified", function () {
         clearTimeout(timeout);
     }
     timeout = setTimeout(function () {
-        if (!window.location.href.includes('youtube')) {
+       
             var buttons = document.querySelectorAll('.speed-up-class');
             var video = document.querySelector('video');
             
@@ -159,7 +159,7 @@ document.addEventListener("DOMSubtreeModified", function () {
                     var button = document.querySelector('.speed-up-primary');
                     button.innerHTML = `x${video.playbackRate}`;
             }
-        }
+        
     }, 1000);
 }, false);
 
