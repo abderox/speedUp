@@ -84,6 +84,7 @@ function Speed_up() {
         button.classList.add("speed-up-primary");
         document.body.appendChild(button2);
         document.body.appendChild(button1);
+        
     }
 
 
@@ -114,9 +115,14 @@ window.onload = function () {
     setTimeout
         (
             function () {
-                Speed_up();
                 var video = document.querySelector('video');
 
+                if(!video)
+                {
+                    return;
+                }
+                Speed_up();
+                
                 video.addEventListener('canplay', function () {
 
                     var playbackRate = localStorage.getItem('speed_up') || video?.playbackRate || 1;
@@ -146,6 +152,18 @@ document.addEventListener("DOMSubtreeModified", function () {
        
             var buttons = document.querySelectorAll('.speed-up-class');
             var video = document.querySelector('video');
+
+            if(!video){
+                
+                if(buttons.length>0)
+                {
+                    buttons.forEach(function (button) {
+                        button.remove();
+                    });
+                }
+
+                return;
+            }
             
             if (buttons.length == 0) {
                 Speed_up();
