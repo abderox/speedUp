@@ -5,7 +5,6 @@
  */
 
 
-
 const createButton = (innerHTML, ...styles) => {
 
     const button = document.createElement('button');
@@ -41,13 +40,17 @@ const createButton = (innerHTML, ...styles) => {
 }
 
 
+function update_locale_storage(val) {
+    localStorage.setItem('speed_up', val);
+}
+
 
 
 function Speed_up() {
     'use strict';
 
     var video = document.querySelector('video');
-    var playbackRate = video?.playbackRate || 1;
+    var playbackRate = localStorage.getItem('speed_up') || video?.playbackRate || 1;
 
     var button = createButton(`x${playbackRate}`, 'white', 'black', '2px solid black', '14px', 'block', 10000, '0.25');
     var button1 = createButton('+', 'white', 'green', '2px solid green', '20px', 'none', 9998, '1');
@@ -87,6 +90,7 @@ function Speed_up() {
     // on click on button1
     button1.addEventListener('click', function () {
         video.playbackRate += 0.25;
+        update_locale_storage(video.playbackRate)
         button.innerHTML = `x${video.playbackRate}`;
     }
     );
@@ -94,35 +98,43 @@ function Speed_up() {
     // on click on button2
     button2.addEventListener('click', function () {
         video.playbackRate -= 0.25;
+        update_locale_storage(video.playbackRate)
         button.innerHTML = `x${video.playbackRate}`;
     }
     );
 
 }
 
+
+
 // when page is loaded
 window.onload = function () {
-    Speed_up();
-    document.addEventListener('keydown', function (e) {
-        
-        var button = document.querySelector('.speed-up-primary');
-        var video = document.querySelector('video');
 
-        switch (e.key) {
-            case 'd':
-                video.playbackRate += 0.25;
-                button.innerHTML = `x${video.playbackRate}`;
-                break;
-            case 's':
-                video.playbackRate -= 0.25;
-                button.innerHTML = `x${video.playbackRate}`;
-                break;
-            default:
-                video.playbackRate = 1;
-                button.innerHTML = `x${video.playbackRate}`;
-        }
-    }
-    );
+
+    setTimeout
+        (
+            function () {
+                Speed_up();
+                var video = document.querySelector('video');
+
+                video.addEventListener('canplay', function () {
+
+                    var playbackRate = localStorage.getItem('speed_up') || video?.playbackRate || 1;
+    
+                    video.playbackRate = parseFloat(playbackRate);
+                    var button = document.querySelector('.speed-up-primary');
+                    button.innerHTML = `x${video.playbackRate}`;
+
+                    video.removeEventListener('canplay', function () { });
+                });
+
+            
+
+            }
+            , 2000
+        );
+
+
 }
 
 timeout = null;
@@ -133,16 +145,68 @@ document.addEventListener("DOMSubtreeModified", function () {
     timeout = setTimeout(function () {
         if (!window.location.href.includes('youtube')) {
             var buttons = document.querySelectorAll('.speed-up-class');
-            if (
-                buttons.length < 1
-            ) {
+            var video = document.querySelector('video');
+            
+            if (buttons.length == 0) {
                 Speed_up();
+            }
+            if (
+                 video?.playbackRate && localStorage.getItem('speed_up')!=null && video?.playbackRate != localStorage.getItem('speed_up')
+            ) {
+                    var playbackRate = localStorage.getItem('speed_up') || video?.playbackRate || 1;
+             
+                    video.playbackRate = parseFloat(playbackRate);
+                    var button = document.querySelector('.speed-up-primary');
+                    button.innerHTML = `x${video.playbackRate}`;
             }
         }
     }, 1000);
 }, false);
 
 
+document.addEventListener('keydown', function (e) {
+
+    var button = document.querySelector('.speed-up-primary');
+    var video = document.querySelector('video');
+
+    if (video) {
+        switch (e.key) {
+            case 'd':
+                video.playbackRate += 0.25;
+                update_locale_storage(video.playbackRate)
+                button.innerHTML = `x${video.playbackRate}`;
+                break;
+            case 's':
+                video.playbackRate -= 0.25;
+                update_locale_storage(video.playbackRate)
+                button.innerHTML = `x${video.playbackRate}`;
+                break;
+            default:
+                button.innerHTML = `x1`;
+        }
+    }
+}
+);
 
 
+// document.addEventListener('DOMNodeInserted', function(event) {
+//     console.log('New video element added',event.target.tagName);
 
+//   });
+
+    // // Create a new Mutation Observer instance
+    // let observer = new MutationObserver(function(mutations) {
+    //     // Check each mutation for changes to the video src
+    //     mutations.forEach(function(mutation) {
+    //       if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
+    //         // The video src has changed, do something here
+    //         console.log('Video src has changed');
+    //       }
+    //     });
+    //   });
+      
+    //   // Configure the observer to watch for attribute changes to the video element
+    //   let config = { attributes: true, attributeFilter: ['src'] };
+      
+    //   // Start observing the video element
+    //   observer.observe(video, config);
