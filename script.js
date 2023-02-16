@@ -4,6 +4,8 @@
  * @Version : 1.0.2
  */
 
+var blurred_div = null;
+// var player_ = null;
 
 const createButton = (innerHTML, ...styles) => {
 
@@ -56,6 +58,7 @@ function Speed_up() {
     var button1 = createButton('+', 'white', 'green', '2px solid green', '20px', 'none', 9998, '1');
     var button2 = createButton('-', 'white', 'green', '2px solid green', '20px', 'none', 9999, '1');
     var button3 = createButton('F', 'white', 'red', '2px solid red', '20px', 'none', 9997, '1');
+
 
     //when button is active
     button.addEventListener('click', function () {
@@ -127,6 +130,13 @@ function Speed_up() {
 
 function toggle_full_screen() {
     var video = document.querySelector('video');
+
+    // if (player_) {
+    //     if (player_.toggleFullscreen) {
+    //         player_?.toggleFullscreen();
+    //     }
+    //     return;
+    // }
     if (video) {
 
         // if video is full 
@@ -160,6 +170,87 @@ function toggle_full_screen() {
 }
 
 
+function blurry_video(video) {
+    var boringText = document.createElement('div');
+    boringText.style.position = "absolute";
+    boringText.style.top = `${(video.clientHeight / 2)}px`;
+    boringText.style.left = "50%";
+    boringText.style.transform = "translate(-50%, 50%)";
+    boringText.style.zIndex = "9999";
+    boringText.style.pointerEvents = "none";
+    boringText.style.userSelect = "none";
+    boringText.style.textAlign = "center";
+    boringText.style.width = "100%";
+    boringText.style.height = "100%";
+    boringText.style.background = "rgba(0,0,0,0.5)";
+    // display flex
+    boringText.style.display = "flex";
+    boringText.style.justifyContent = "center";
+    boringText.style.alignItems = "center";
+    // create h1
+    var h1 = document.createElement('h1');
+    h1.innerText = "Hidden";
+    h1.style.fontSize = "100px";
+    h1.style.fontWeight = "bold";
+    h1.style.color = "white";
+    h1.style.textShadow = "0 0 10px black";
+    h1.style.zIndex = "9999";
+    h1.style.pointerEvents = "none";
+    h1.style.textAlign = "center";
+    h1.style.width = "100%";
+    h1.style.height = "100%";
+    //opacity
+    h1.style.opacity = "0.25";
+    // animation rainbow
+    var keyframes = [
+        { color: 'red' },
+        { color: 'orange' },
+        { color: 'yellow' },
+        { color: 'green' },
+        { color: 'blue' },
+        { color: 'indigo' },
+        { color: 'violet' }
+    ];
+
+    var options = {
+        duration: 3000,
+        iterations: Infinity,
+        easing: 'ease-in-out'
+    };
+
+    var animation = boringText.animate(keyframes, options);
+    // add animation to h1
+    h1.animate(keyframes, options);
+    // add h1 to div
+    boringText.appendChild(h1);
+    // class list
+    boringText.classList.add("speed-up-blurry");
+    return boringText;
+}
+
+// function yt_ad_detection_handler(video) {
+
+    
+//     console.log(player_)
+//     if (player_) {
+//         var adState = player_.getAdState();
+//         if (adState === 1) {
+//             player_.mute();
+//             if (video) {
+//                 video.style.filter = "blur(20px)";
+//                 blurred_div = blurry_video(video);
+//                 video.parentElement.appendChild(blurred_div);
+//             }
+//         }
+//         else {
+//             player_.unMute();
+//             if (video) {
+//                 video.style.filter = "";
+//                 video.parentNode.removeChild(blurred_div);
+//             }
+//         }
+//     }
+// }
 
 // when page is loaded
 window.onload = function () {
@@ -169,32 +260,36 @@ window.onload = function () {
         (
             function () {
                 var video = document.querySelector('video');
-                // var yt_btn_ad = document.querySelector('.ytp-ad-skip-button');
-
-
-                // if (yt_btn_ad) {
-                //     console.log("boring ad is comming")
-                //     yt_btn_ad.click();
-                // }
 
                 if (!video) {
                     return;
                 }
-                Speed_up();
 
+                Speed_up();
+                
                 // create a new observer instance
                 const observer = new MutationObserver(function (mutations) {
                     mutations.forEach(function (mutation) {
                         if (mutation.type == 'attributes') {
 
                             var yt_btn_ad = document.querySelector('.ytp-ad-skip-button');
+                            var buttons = document.querySelectorAll('.speed-up-class');
+                            var video = document.querySelector('video');
+
                             if (yt_btn_ad) {
                                 console.log("boring ad is skiped")
                                 yt_btn_ad.click();
                             }
 
-                            var buttons = document.querySelectorAll('.speed-up-class');
-                            var video = document.querySelector('video');
+                            // yt_ad_detection_handler(video);
+
+                            if (blurred_div && video) {
+                                video.addEventListener('resize', function () {
+                                    var videoRect = video.getBoundingClientRect();
+                                    blurred_div.style.top = (videoRect.height / 2) + "px";
+                                    blurred_div.style.left = (videoRect.width / 2) + "px";
+                                });
+                            }
 
                             if (!video) {
 
@@ -242,31 +337,20 @@ window.onload = function () {
 
 
             }
-            , 1000
+            , 500
         );
+
+  
 
 
 }
-
-// timeout = null;
-// document.addEventListener("DOMSubtreeModified", function () {
-//     if (timeout) {
-//         clearTimeout(timeout);
-//     }
-//     timeout = setTimeout(function () {
-
-
-
-//     }, 1000);
-// }, false);
-
 
 document.addEventListener('keydown', function (e) {
 
     var button = document.querySelector('.speed-up-primary');
     var video = document.querySelector('video');
 
-    if (video) {
+    if (video && button) {
         switch (e.key) {
             case 'd':
                 video.playbackRate += 0.25;
@@ -277,6 +361,19 @@ document.addEventListener('keydown', function (e) {
                 video.playbackRate -= 0.25;
                 update_locale_storage(video.playbackRate)
                 button.innerHTML = `x${video.playbackRate}`;
+                break;
+            case 'b':
+                //toggle blurry div
+                if (!blurred_div) {
+                    blurred_div = blurry_video(video);
+                    video.style.filter = "blur(20px)";
+                    video.parentElement.appendChild(blurred_div);
+                }
+                else {
+                    video.style.filter = "";
+                    video.parentNode.removeChild(blurred_div);
+                    blurred_div = null;
+                }
                 break;
             default:
                 button.innerHTML = `x1`;
