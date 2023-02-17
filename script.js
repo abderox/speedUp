@@ -5,6 +5,7 @@
  */
 
 var blurred_div = null;
+var blurred_div_ = null;
 // var player_ = null;
 
 const createButton = (innerHTML, ...styles) => {
@@ -170,10 +171,10 @@ function toggle_full_screen() {
 }
 
 
-function blurry_video(video) {
+function blurry_video(video = null) {
     var boringText = document.createElement('div');
     boringText.style.position = "absolute";
-    boringText.style.top = `${(video.clientHeight / 2)-50}px`;
+    boringText.style.top = video ? `${(video.clientHeight / 2) - 50}px` : "50px"
     boringText.style.left = "50%";
     boringText.style.transform = "translate(-50%, 50%)";
     boringText.style.zIndex = "9999";
@@ -325,7 +326,7 @@ window.onload = function () {
 
                 // start observing the button for changes to its attributes
                 if (window.location.href.includes("youtube")) {
-                observer.observe(video, { attributes: true });
+                    observer.observe(video, { attributes: true });
                 }
 
                 video.addEventListener('canplay', function () {
@@ -363,6 +364,13 @@ document.addEventListener("DOMSubtreeModified", function () {
             var buttons = document.querySelectorAll('.speed-up-class');
             var video = document.querySelector('video');
 
+            // if video is embeded in iframe
+
+            if (video && video.parentElement.tagName == "IFRAME") {
+                video = video.parentElement;
+            }
+
+
             if (!video) {
 
                 if (buttons.length > 0) {
@@ -387,6 +395,7 @@ document.addEventListener("DOMSubtreeModified", function () {
                 button.innerHTML = `x${video.playbackRate}`;
             }
 
+
         }, 1000);
     }
 }, false);
@@ -395,6 +404,9 @@ document.addEventListener('keydown', function (e) {
 
     var button = document.querySelector('.speed-up-primary');
     var video = document.querySelector('video');
+    var video_element = document.querySelector('video-element');
+    var videos = video ?? document.querySelectorAll('video');
+    var iframe = document.querySelector('iframe[allow*="autoplay;"]');
 
     if (video && button) {
         switch (e.key) {
@@ -410,34 +422,125 @@ document.addEventListener('keydown', function (e) {
                 break;
             case 'b':
                 //toggle blurry div
+
+                if (video_element) {
+
+                    if (!blurred_div_) {
+                        blurred_div_ = blurry_video(video_element);
+                        video_element.style.filter = "blur(45px)";
+                        video_element.parentElement.appendChild(blurred_div_);
+                    }
+                    else {
+                        video_element.style.filter = "";
+                        video_element.parentNode.removeChild(blurred_div_);
+                        blurred_div_ = null;
+                    }
+
+                    return;
+                }
                 if (!blurred_div) {
                     blurred_div = blurry_video(video);
                     video.style.filter = "blur(45px)";
                     video.parentElement.appendChild(blurred_div);
+                    if (videos.length > 1) {
+                        videos.forEach(function (video_) {
+                            if (!video.paused && video_ != video) {
+                                toggle_muted_video(video);
+                                video_.style.filter = "blur(45px)";
+                                video_.parentElement.appendChild(blurred_div);
+                            }
+                        }
+                        );
+
+                    }
+
                 }
                 else {
                     video.style.filter = "";
                     video.parentNode.removeChild(blurred_div);
+
+                    if (videos.length > 1) {
+                        videos.forEach(function (video_) {
+                            if (!video.paused && video_ != video) {
+                                toggle_muted_video(video);
+                                video_.style.filter = "";
+                                video_.parentNode.removeChild(blurred_div);
+                            }
+                        }
+                        );
+
+                    }
+
                     blurred_div = null;
                 }
+
                 break;
 
             case 'h':
+
                 toggle_muted_video(video);
                 if (!blurred_div) {
                     blurred_div = blurry_video(video);
                     video.style.filter = "blur(45px)";
                     video.parentElement.appendChild(blurred_div);
+
+                    if (videos.length > 1) {
+                        videos.forEach(function (video_) {
+                            if (video_ != video) {
+                                toggle_muted_video(video);
+                                video_.style.filter = "blur(45px)";
+                                video_.parentElement.appendChild(blurred_div);
+                            }
+                        }
+                        );
+
+                    }
                 }
                 else {
                     video.style.filter = "";
                     video.parentNode.removeChild(blurred_div);
+                    if (videos.length > 1) {
+                        videos.forEach(function (video_) {
+                            if (video_ != video) {
+                                toggle_muted_video(video);
+                                video_.style.filter = "";
+                                video_.parentNode.removeChild(blurred_div);
+                            }
+                        }
+                        );
+
+                    }
                     blurred_div = null;
                 }
+
+
                 break;
 
             default:
                 button.innerHTML = `x1`;
+        }
+
+
+    }
+    else {
+        switch (e.key) {
+            case 'c':
+
+                if (iframe ) {
+                    //blur the iframe
+                    if (!blurred_div) {
+                        blurred_div = blurry_video();
+                        iframe.style.filter = "blur(45px)";
+                        iframe.appendChild(blurred_div);
+                    }
+                    else {
+                        iframe.style.filter = "";
+                        iframe.removeChild(blurred_div);
+                        blurred_div = null;
+                    }
+                }
+                break;
+
         }
     }
 }
