@@ -173,7 +173,7 @@ function toggle_full_screen() {
 function blurry_video(video) {
     var boringText = document.createElement('div');
     boringText.style.position = "absolute";
-    boringText.style.top = `${(video.clientHeight / 2)}px`;
+    boringText.style.top = `${(video.clientHeight / 2)-50}px`;
     boringText.style.left = "50%";
     boringText.style.transform = "translate(-50%, 50%)";
     boringText.style.zIndex = "9999";
@@ -324,9 +324,9 @@ window.onload = function () {
                 });
 
                 // start observing the button for changes to its attributes
-
+                if (window.location.href.includes("youtube")) {
                 observer.observe(video, { attributes: true });
-
+                }
 
                 video.addEventListener('canplay', function () {
 
