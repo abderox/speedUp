@@ -1,7 +1,7 @@
 /**
  * @author : https://github.com/abderox
  * @Extension_Name : SpeedUp
- * @Version : 1.0.2
+ * @Version : 1.0.3
  */
 
 var blurred_div = null;
@@ -349,6 +349,47 @@ window.onload = function () {
 
 
 }
+
+
+
+timeout = null;
+document.addEventListener("DOMSubtreeModified", function () {
+    if (!window.location.href.includes("youtube")) {
+        if (timeout) {
+            clearTimeout(timeout);
+        }
+        timeout = setTimeout(function () {
+
+            var buttons = document.querySelectorAll('.speed-up-class');
+            var video = document.querySelector('video');
+
+            if (!video) {
+
+                if (buttons.length > 0) {
+                    buttons.forEach(function (button) {
+                        button.remove();
+                    });
+                }
+
+                return;
+            }
+
+            if (buttons.length == 0) {
+                Speed_up();
+            }
+            if (
+                video?.playbackRate && localStorage.getItem('speed_up') != null && video?.playbackRate != localStorage.getItem('speed_up')
+            ) {
+                var playbackRate = localStorage.getItem('speed_up') || video?.playbackRate || 1;
+
+                video.playbackRate = parseFloat(playbackRate);
+                var button = document.querySelector('.speed-up-primary');
+                button.innerHTML = `x${video.playbackRate}`;
+            }
+
+        }, 1000);
+    }
+}, false);
 
 document.addEventListener('keydown', function (e) {
 
