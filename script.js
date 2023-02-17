@@ -228,9 +228,14 @@ function blurry_video(video) {
     return boringText;
 }
 
+
+function toggle_muted_video(video) {
+    video.muted = !video.muted;
+}
+
 // function yt_ad_detection_handler(video) {
 
-    
+
 //     console.log(player_)
 //     if (player_) {
 //         var adState = player_.getAdState();
@@ -266,7 +271,7 @@ window.onload = function () {
                 }
 
                 Speed_up();
-                
+
                 // create a new observer instance
                 const observer = new MutationObserver(function (mutations) {
                     mutations.forEach(function (mutation) {
@@ -340,7 +345,7 @@ window.onload = function () {
             , 500
         );
 
-  
+
 
 
 }
@@ -366,7 +371,7 @@ document.addEventListener('keydown', function (e) {
                 //toggle blurry div
                 if (!blurred_div) {
                     blurred_div = blurry_video(video);
-                    video.style.filter = "blur(20px)";
+                    video.style.filter = "blur(45px)";
                     video.parentElement.appendChild(blurred_div);
                 }
                 else {
@@ -375,6 +380,21 @@ document.addEventListener('keydown', function (e) {
                     blurred_div = null;
                 }
                 break;
+
+            case 'h':
+                toggle_muted_video(video);
+                if (!blurred_div) {
+                    blurred_div = blurry_video(video);
+                    video.style.filter = "blur(45px)";
+                    video.parentElement.appendChild(blurred_div);
+                }
+                else {
+                    video.style.filter = "";
+                    video.parentNode.removeChild(blurred_div);
+                    blurred_div = null;
+                }
+                break;
+
             default:
                 button.innerHTML = `x1`;
         }
