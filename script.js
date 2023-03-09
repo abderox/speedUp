@@ -1,19 +1,74 @@
 /**
  * @author : https://github.com/abderox
  * @Extension_Name : SpeedUp
- * @Version : 1.0.3
+ * @Version : 1.0.4
  */
 
 var blurred_div = null;
 var blurred_div_ = null;
+var button__ = null;
 // var player_ = null;
+var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+function save_top_and_left(top, left) {
+    localStorage.setItem('coords', JSON.stringify({ top: top, left: left }));
+}
+
+function get_top_right() {
+    if (localStorage.getItem('coords')) {
+        return JSON.parse(localStorage.getItem('coords'));
+    }
+    return null;
+}
+
+
+
+function closeDragElement() {
+    document.onmouseup = null;
+    document.onmousemove = null;
+}
+
+function elementDrag(e) {
+
+    var otherButtons = document.querySelectorAll('.speed-up-class');
+
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+
+    otherButtons.forEach(function (btn) {
+        btn.style.top = (pos4 - pos2) + "px";
+        btn.style.left = (pos3 - pos1) + "px";
+    }
+    );
+
+    save_top_and_left(pos4 - pos2, pos3 - pos1);
+
+}
+
+
+function dragMouseDown(e) {
+    var button_rect = button__.getBoundingClientRect();
+    var button_x = button_rect.x;
+    var button_y = button_rect.y;
+
+    var mouse_x = e.clientX;
+    var mouse_y = e.clientY;
+
+    pos1 = mouse_x - button_x;
+    pos2 = mouse_y - button_y;
+
+    document.onmouseup = closeDragElement;
+    document.onmousemove = elementDrag;
+}
 
 const createButton = (innerHTML, ...styles) => {
 
+    const coords = get_top_right();
     const button = document.createElement('button');
     button.style.position = 'fixed';
-    button.style.top = '50%';
-    button.style.right = '60px';
+    button.style.top = coords ? `${coords?.top}px` : '50%';
+    button.style.left = coords ? `${coords?.left}px` : '';
+    button.style.right = coords ? '0' : '60px';
     button.style.zIndex = styles[5];
     button.style.backgroundColor = styles[0];
     button.style.color = styles[1];
@@ -132,12 +187,6 @@ function Speed_up() {
 function toggle_full_screen() {
     var video = document.querySelector('video');
 
-    // if (player_) {
-    //     if (player_.toggleFullscreen) {
-    //         player_?.toggleFullscreen();
-    //     }
-    //     return;
-    // }
     if (video) {
 
         // if video is full 
@@ -234,30 +283,6 @@ function toggle_muted_video(video) {
     video.muted = !video.muted;
 }
 
-// function yt_ad_detection_handler(video) {
-
-
-//     console.log(player_)
-//     if (player_) {
-//         var adState = player_.getAdState();
-//         if (adState === 1) {
-//             player_.mute();
-//             if (video) {
-//                 video.style.filter = "blur(20px)";
-//                 blurred_div = blurry_video(video);
-//                 video.parentElement.appendChild(blurred_div);
-//             }
-//         }
-//         else {
-//             player_.unMute();
-//             if (video) {
-//                 video.style.filter = "";
-//                 video.parentNode.removeChild(blurred_div);
-//             }
-//         }
-//     }
-// }
-
 // when page is loaded
 window.onload = function () {
 
@@ -339,6 +364,11 @@ window.onload = function () {
 
                     video.removeEventListener('canplay', function () { });
                 });
+
+
+                // make button draggable
+                button__ = document.querySelector('.speed-up-primary');
+                button__.onmousedown = dragMouseDown;
 
 
 
@@ -526,7 +556,7 @@ document.addEventListener('keydown', function (e) {
         switch (e.key) {
             case 'c':
 
-                if (iframe ) {
+                if (iframe) {
                     //blur the iframe
                     if (!blurred_div) {
                         blurred_div = blurry_video();
@@ -545,6 +575,9 @@ document.addEventListener('keydown', function (e) {
     }
 }
 );
+
+
+
 
 
 
